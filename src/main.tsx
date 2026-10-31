@@ -46,7 +46,7 @@ function App() {
         <h1 id="hero-title">{event.name}<span className="edition">{event.edition}<span className="edition-rule"/></span></h1>
         <div className="hero-bottom">
           <div className="hero-copy"><p className="hero-tagline">Extraordinary things happen<br/>when worlds align.</p><p className="hero-description">A 24-hour collision of ideas, code, and possibility.<br className="desktop-break"/> ACM Thapar’s flagship hackathon is back.</p><div className="hero-actions">{preregister}<a className="button button-text" href="#about">Explore the event <Arrow down/></a></div></div>
-          <div className="hero-event"><span className="mono subtle">YOUR NEXT BIG IDEA STARTS HERE</span><div className="event-date">{event.dayRange} <span>{event.monthYear}</span></div><div className="event-location"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="10" r="2" stroke="currentColor" strokeWidth="1.5"/></svg>{event.venue}<span className="location-dot"/>IN PERSON</div></div>
+          <div className="hero-event"><span className="mono subtle">YOUR NEXT BIG IDEA STARTS HERE</span><div className="event-date">{event.dayRange} <span>{event.monthYear}</span></div><div className="event-location"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="10" r="2" stroke="currentColor" strokeWidth="1.5"/></svg><span className="venue-name">{event.venue}</span><span className="location-dot"/><span className="event-format">IN PERSON</span></div></div>
         </div>
         <div className="hero-baseline"><a href="#about"><span className="scroll-line"/>SCROLL TO DISCOVER</a><span>IDEAS WITHOUT LIMITS. CODE BEYOND THE ORDINARY.</span><span>01 / 07 <Cross/></span></div>
       </section>
@@ -61,5 +61,6 @@ function App() {
   </>;
 }
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App/></React.StrictMode>);
+
 
 
