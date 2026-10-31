@@ -2,44 +2,42 @@
 
 31 October 2026
 
-## Passed
+## Production and deployment
 
-- `npm run build`: strict TypeScript checks and optimized Vite production build passed.
-- `npm run check:assets`: production HTML and all six local resources returned HTTP 200 under `/` and `/Eclipse7.0/`; expected MIME types matched.
-- Official logo, original moon, partner logo, favicon, generated CSS and generated JavaScript exist in `dist/`.
-- System font stacks have no external font dependency.
-- Official pre-registration URL returned HTTP 200. The form was not submitted.
-- npm dependency audit reported zero known vulnerabilities at install time.
-- Static review: mobile menu with expanded state and Escape handler; native FAQ disclosures; native anchors and matching section IDs; reduced-motion CSS; external link `noopener noreferrer`; no API keys, backend, analytics or local personal-data collection.
+- `npm run build`: strict TypeScript checking and optimized Vite production build passed.
+- `npm run check:assets`: production HTML and six local assets returned HTTP 200 with expected MIME types under both `/` and `/Eclipse7.0/`.
+- `npm run preview:standalone`: generated `outputs/ECLIPSE-preview.html` with embedded CSS, JavaScript, images and favicon. Embedded production JavaScript passed a syntax check and has no external module imports.
+- GitHub Actions https://github.com/talwarmohnish/Eclipse7.0/actions/runs/41171141282 passed build, asset checks and Pages deployment for the mobile fixes (`a03cad8389d124ffd166e50476a5db423d5efacb`).
+- Live website: https://talwarmohnish.github.io/Eclipse7.0/ . Page, JavaScript, CSS, favicon and all image files returned HTTP 200.
+- All page images loaded successfully in the browser. Font stacks use local system fonts; no web-font request is required.
+- Dependency audit reported zero known vulnerabilities at installation.
 
-## Browser limitations
+## Browser verification completed
 
-Attempts to open the local Vite and static production servers in the embedded browser timed out, although an in-process HTTP check returned 200. The Windows browser fallback then stopped because the browser tool could not confidently determine the current browser URL for its safety policy. No security settings were changed.
+The live site was inspected at 1440×900 desktop, 768×1024 tablet, 390×844 mobile, and 320×800 narrow mobile sizes. Full desktop and mobile page layouts were reviewed visually.
 
-Desktop/mobile screenshots, real browser interaction tests, measured layout/overflow checks and runtime console inspection could not be completed. These remain unverified. Source review and production asset checks are not substitutes for those visual tests.
+- Hero typography, moon, date, actions and major section layouts inspected.
+- No horizontal overflow at 1440, 768 and 390 pixels. A 320-pixel overflow was found, corrected and rechecked: document width and client width are both 305 pixels with a 15-pixel browser scrollbar.
+- Mobile venue/attendance labels originally ran together. They now have separate elements, a clear two-line layout, and larger venue type.
+- Main hero actions remain visible around 550 pixels down the 390×844 viewport.
+- Mobile menu opens and closes, reflects `aria-expanded`, closes with Escape and returns focus to the toggle.
+- Mobile Timeline navigation closes the menu and changes the URL to `#timeline`.
+- Desktop FAQ navigation and back-to-top links work. Every local anchor has a matching element ID.
+- FAQ answers open by click and close with Enter on desktop and Space on mobile.
+- Pre-register opens the official form at https://eclipse.acmthapar.in/pre-register in a new tab. The official heading, 3–4 April 2027 date and interest form were visible. No fields were filled and nothing was submitted.
+- No console warnings or errors were captured during these checks.
+- Browser viewport overrides were reset after testing.
 
-## Local preview
+Reduced-motion handling, skip link, focus styling, email destinations and external-link attributes were checked in source. Reduced-motion preferences were not emulated, and email/social links were not used to send messages.
 
-- Standard repeatable command: `npm run preview -- --port 4173` after `npm run build`.
-- Local preview servers were started, but could not be reached across tool calls; no persistent server is claimed as available.
-- `npm run preview:standalone` generated `outputs/ECLIPSE-preview.html` with all assets embedded. Its embedded production JavaScript passed a syntax check and has no dynamic imports or import-meta dependency. Open this file directly, or run the standard Vite preview command in a local terminal.
+## Local preview and source
 
-## Remaining content
+The local folder is linked to https://github.com/talwarmohnish/Eclipse7.0 and tracks origin/main. Generated HTML, ZIPs and review screenshots are ignored by Git.
 
-Tracks/problem statements, final team registration platform/link, detailed schedule and submission milestones, additional current sponsors and prizes need organizer confirmation. Sources and editable fields are listed in `CONTENT-SOURCES.md`.
+Open `outputs/ECLIPSE-preview.html` directly for a standalone local preview. Alternatively run `npm run preview -- --port 4173` after building. Earlier local-server browser connections were blocked by the environment; live-site browser QA subsequently completed as described above.
 
-## GitHub and CI
+`outputs/mobile-review.png` shows the final mobile hero. `outputs/website-review.png` shows the final desktop hero. The production ZIP contains the latest `dist/` output.
 
-- Source published to https://github.com/talwarmohnish/Eclipse7.0 on `main`.
-- Initial workflow run https://github.com/talwarmohnish/Eclipse7.0/actions/runs/41170076199 passed npm ci, the production build and asset checks on GitHub’s Ubuntu runner.
-- Initial deployment stopped because GitHub Pages was not enabled for the repository. The action reported “Get Pages site failed” / “Not Found.”
-- The workflow now separates successful build/upload from Pages configuration and deployment. Enable Settings → Pages → Source: GitHub Actions, then rerun the workflow.
-- Publication to GitHub does not imply a live Pages deployment has completed.
+## Remaining event details
 
-## Verified live deployment
-
-GitHub Actions run https://github.com/talwarmohnish/Eclipse7.0/actions/runs/41170522692 completed successfully, including the build job and the Pages deployment job. The deployment log returned https://talwarmohnish.github.io/Eclipse7.0/ as its environment URL and reported success.
-
-The live URL returned HTTP 200 with the correct ECLIPSE 7.0 document title. Its JavaScript bundle, stylesheet, favicon, official ACM logo, Devfolio logo and original moon SVG all returned HTTP 200. The website uses system fonts with no remote font dependency.
-
-The initial Pages setup blocker has been resolved. The local project now has an origin remote and tracks origin/main. Generated preview HTML and production ZIP are ignored by Git. Browser layout and real interaction testing remain unverified as described above.
+Tracks/problem statements, final team registration URL/platform, detailed schedule and submission milestones, additional current sponsors, and prizes await organizer confirmation. See `CONTENT-SOURCES.md`. No unsupported prize, sponsor or registration promise was added.
