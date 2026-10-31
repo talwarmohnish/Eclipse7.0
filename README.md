@@ -72,4 +72,4 @@ Awaiting confirmation: tracks/problem statements, final team registration link, 
 
 ## Verification
 
-See `outputs/VERIFICATION.md` for the production and browser test record. Both themes were visually inspected at 360, 390, 768 and 1440px. Checks covered overflow, roadmap alignment, all requested direct/refreshed fragment URLs, menu/focus handling, keyboard FAQs, theme persistence, official pre-registration and local asset paths.
+See `outputs/VERIFICATION.md` for the current reload test record. About, Roadmap and FAQs were visited and refreshed on desktop (1440px, dark) and mobile (390px, light); every reload removed the hash and revealed the hero at scroll zero. All five section links still work during a visit. The preceding interaction pass checked both themes at 360, 390, 768 and 1440px, including overflow, keyboard controls, theme persistence, roadmap interactions and official registration links.

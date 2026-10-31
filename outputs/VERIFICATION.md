@@ -1,59 +1,37 @@
-# Interaction polish — verification
+# Reload-to-hero verification
 
 31 October 2026
 
-## Changes
+## Current behaviour
 
-- Duration statistic is visually `24 hr`, with baseline-aligned units and a screen-reader-only `24 hours` label. Prose still says `24-hour hackathon`.
-- Fresh plain URLs start at the hero. Initial explicit fragments align after React commits and local fonts settle. Measured CSS scroll-padding handles subsequent native anchors; hash changes no longer force scrolling. Browser history and scrollRestoration remain untouched.
-- Radar uses a single infinite 14-second CSS animation. IntersectionObserver and document visibility only change its play-state, retaining rotation phase. Reduced-motion shows a static sweep.
-- Pyramid illustration responds to fine mouse pointers within its open illustration area, with a maximum 4-degree tilt. Pointer work is coalesced into one animation frame. Pointer exit, scrolling or media-preference changes reset tilt. Text, numbered controls and registration button remain stationary.
-- Milestone proximity highlights the node, corresponding route and description. Numbered buttons and the registration link provide keyboard focus highlighting. Mobile retains its static geometry and readable ordered list.
-- About nodes and labels highlight only their existing connection, node and label. No controls, movement or new geometry were added. Shape/text attributes were compared with the previous source and matched exactly.
-- Desktop pyramid height reduced from 740px to 620px (660px at 901–1150px), with tighter section spacing. Mobile spacing remains readable.
-- Existing moon asset, wordmark paths, seeded stars, palettes, official logos, theme bootstrap and event information are preserved. Source checks confirmed event content, moon and index metadata unchanged.
+Every full browser reload opens at the ECLIPSE hero, including reloads from section fragments. The document-head bootstrap removes the hash with history.replaceState, retaining the pathname, query string and existing history state without adding an entry. It switches restoration to manual before body markup can render.
 
-## Production
+React skips initial and font-ready hash alignment for that reload. The root stays hidden until page loading and fonts settle, then two animation frames reset scroll to zero before revealing it. Restoration remains manual until the next pointer, keyboard, touch, wheel or click interaction, or page exit. No recurring scroll loop or section-link interception is used.
 
-- Strict TypeScript / Vite production build passed.
-- Seven local production resources passed HTTP/MIME checks under both `/` and `/Eclipse7.0/`.
-- Live HTML, JavaScript, CSS, favicon, logos, moon and Manrope font returned HTTP 200.
-- Standalone preview passed embedded-asset and JavaScript syntax checks: 369,831 bytes. Production ZIP refreshed.
-- Interaction deployment passed: https://github.com/talwarmohnish/Eclipse7.0/actions/runs/41191067874 . Documentation is published through the same existing workflow.
+Fresh deep-link visits still honour their fragment. About, Tracks, Roadmap, Partners and FAQs continue using native anchors during the visit. Existing design, event content, theme choices and effects were not changed.
 
-## Browser checks
+This policy supersedes the earlier verification record in which full reloads retained their fragment or scroll position.
 
-Dark and light themes were inspected at 360, 390, 768 and 1440px widths. Screenshots are saved locally in outputs.
+## Passed checks
 
-| Check | Result |
-| --- | --- |
-| Horizontal overflow | All eight theme/width combinations passed; document width equals content viewport; no text, link or FAQ question overflows |
-| Typography | Body 16px mobile/tablet, 17px desktop; FAQ questions 18px mobile/tablet, 19px desktop |
-| Duration accessibility | Accessibility tree exposes `24 hours`; visible numeral/unit use baseline alignment |
-| Fresh homepage | New plain-URL tab opened at scrollY 0 with the hero below the header |
-| Direct fragments and reload | 32 checks passed: four sections × four widths × both themes; all requested sections clear the header |
-| Native Back | Arbitrary `#about` scroll position restored exactly: 1765.5999755859375px |
-| Native Forward | Prior `#faqs` position restored exactly: 4056.800048828125px |
-| Plain-URL reload | A scrolled plain URL retained 4214.39990234375px rather than being forced to the hero |
-| Radar beyond 30 seconds | Still running and changing rotation after 45.3 seconds continuously visible |
-| Radar offscreen/resume | Paused offscreen; identical transform in separated samples; resumed rotation on return |
-| Pointer tilt | Measured approximately -0.78deg X / 3.57deg Y; route/node/description highlight active near milestone 3 |
-| Text/click stability | All description and registration-button rectangles, plus scrollY, identical before/after native pointer input |
-| Reset | Pointer exit restored both tilt variables to 0deg and cleared pointer highlight |
-| Keyboard | Milestone 1 → registration link → milestone 2 focus updates highlighting; mobile milestone activation also highlights its route |
-| About | Each node/label activates only its corresponding connection; diagram transform remains none |
-| Mobile menu | Opens/closes, Escape returns focus, section link closes menu and clears the sticky header |
-| FAQs | Pointer and Enter open/close passed in both themes |
-| Theme | Pointer/Enter toggling and persistence across repeated reloads passed |
-| Registration | Roadmap action opens the official pre-registration form in a new tab |
-| Console | No warnings or errors recorded |
+- Strict TypeScript / Vite production build.
+- Page and seven production resources served correctly under both / and /Eclipse7.0/.
+- Standalone preview regenerated with embedded assets; the application script and both startup scripts passed syntax checks (371,452 bytes).
+- Pre-render bootstrap contract tested for reload, fresh navigation and Back/Forward navigation. Reload uses replaceState before scrolling; other navigation types leave history and scrolling untouched. No pushState call is introduced.
+- Deployed race fix: https://github.com/talwarmohnish/Eclipse7.0/actions/runs/41210688151 .
 
-Native accessibility actions were used to verify history restoration because the locator-click automation scrolls elements into view before activating them; that test-tool behaviour changes the position stored in history.
+| Refresh source | Desktop 1440px, dark | Mobile 390px, light |
+| --- | --- | --- |
+| About | Hero visible, hash empty, scrollY 0 | Hero visible, hash empty, scrollY 0 |
+| Roadmap | Hero visible, hash empty, scrollY 0 | Hero visible, hash empty, scrollY 0 |
+| FAQs | Hero visible, hash empty, scrollY 0 | Hero visible, hash empty, scrollY 0 |
 
-## Verification limits
+Each test first navigated to the section and confirmed a nonzero scroll position, then fully reloaded. The earliest post-reload observations and subsequent visible-hero observations were at scrollY 0. Later FAQ checks remained at zero, with no return to the old section. Reload screenshots show the hero; no section-to-hero jump was observed in browser checks.
 
-The browser environment kept documents visible even when another tab was opened, so an actual hidden-tab transition could not be induced reliably. The document.visibilitychange listener and pause/resume CSS were inspected; hidden-tab behaviour is implemented but not claimed as behaviourally verified. OS reduced-motion emulation was unavailable; its explicit static-radar/no-tilt rules and global animation overrides were inspected.
+A late-restoration race found during the initial FAQ test was corrected before the successful repeat tests above. The final implementation keeps restoration blocked beyond page loading rather than restoring auto mode immediately.
 
-The browser cannot reach the sandboxed local server or open the standalone file. Local production HTTP/asset tests and standalone validation passed; visual and interaction testing used the matching deployed HTTPS bundle. No registration form was submitted.
+All five section destinations were exercised after reload. Mobile menu links closed the menu and left the selected section clear of the sticky header. Back and Forward did not expose an extra pre-replacement section entry. Theme choice persisted across reloads. No browser warnings or errors were recorded.
 
-Unconfirmed tracks, detailed schedule, final team registration link, additional sponsors and prizes remain concise announcement notices. No event facts or links were invented.
+## Scope and limits
+
+Browser verification used the deployed HTTPS production build. The sandboxed local server and standalone file cannot be opened by this browser tool; their production assets and embedded scripts were validated programmatically. Broader responsive layout, radar, pyramid, FAQ and accessibility checks are recorded in the preceding interaction-pass commit; this focused pass did not change those designs.
