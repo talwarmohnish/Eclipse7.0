@@ -75,22 +75,33 @@ function App() {
     const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
     const initialHash = window.location.hash;
     const reloading = nav?.type === 'reload' || document.documentElement.hasAttribute('data-reload-top');
-    let restoreFrame = 0;
+    let revealFrame = 0;
+    let reloadRevealed = false;
     const previousRestoration = document.documentElement.dataset.reloadRestoration === 'manual' ? 'manual' : 'auto';
     const restoreScrollMode = () => {
-      restoreFrame = requestAnimationFrame(() => {
-        history.scrollRestoration = previousRestoration;
-        delete document.documentElement.dataset.reloadRestoration;
+      history.scrollRestoration = previousRestoration;
+      delete document.documentElement.dataset.reloadRestoration;
+    };
+    const revealReload = () => {
+      revealFrame = requestAnimationFrame(() => {
+        if (disposed) return;
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        revealFrame = requestAnimationFrame(() => {
+          if (disposed) return;
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+          delete document.documentElement.dataset.reloadTop;
+          reloadRevealed = true;
+        });
       });
     };
     if (reloading) {
-      // The head script already removed the fragment and blocked native restoration.
-      // Reveal the committed hero at zero before the browser can paint this frame.
+      // Keep native restoration blocked through load, fonts and the first frames.
+      // The hero stays hidden until its final zero-position layout is ready.
       history.scrollRestoration = 'manual';
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      delete document.documentElement.dataset.reloadTop;
-      if (document.readyState === 'complete') restoreScrollMode();
-      else window.addEventListener('pageshow', restoreScrollMode, { once: true });
+      const loaded = document.readyState === 'complete' ? Promise.resolve() : new Promise<void>(resolve => window.addEventListener('load', () => resolve(), { once: true }));
+      Promise.all([loaded, document.fonts.ready]).then(() => { if (!disposed) revealReload(); });
+      window.addEventListener('pagehide', restoreScrollMode);
     }
     const updateOffset = () => {
       const height = document.querySelector('.nav-shell')?.getBoundingClientRect().height ?? 88;
@@ -100,8 +111,11 @@ function App() {
     const resize = new ResizeObserver(updateOffset);
     const header = document.querySelector('.nav-shell');
     if (header) resize.observe(header);
-    const markInteraction = () => { interacted = true; };
-    const inputs = ['wheel', 'pointerdown', 'touchstart', 'keydown'] as const;
+    const markInteraction = () => {
+      interacted = true;
+      if (reloading && reloadRevealed) restoreScrollMode();
+    };
+    const inputs = ['wheel', 'pointerdown', 'touchstart', 'keydown', 'click'] as const;
     inputs.forEach(type => window.addEventListener(type, markInteraction, { passive: true }));
     const alignInitial = () => {
       if (disposed || interacted || reloading || nav?.type === 'back_forward' || window.location.hash !== initialHash) return;
@@ -125,8 +139,8 @@ function App() {
       disposed = true;
       resize.disconnect();
       if (reloading) {
-        cancelAnimationFrame(restoreFrame);
-        window.removeEventListener('pageshow', restoreScrollMode);
+        cancelAnimationFrame(revealFrame);
+        window.removeEventListener('pagehide', restoreScrollMode);
         history.scrollRestoration = previousRestoration;
       }
       inputs.forEach(type => window.removeEventListener(type, markInteraction));
