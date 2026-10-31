@@ -1,133 +1,75 @@
 # ECLIPSE 7.0 — The Observatory
 
-An original, responsive frontend for ACM Thapar’s flagship hackathon. React 19, Vite 7, TypeScript and CSS. No backend, authentication, database, analytics, or API keys.
+Original React 19 / Vite 7 / TypeScript frontend for ACM Thapar’s flagship hackathon. Frontend only; no database, authentication, analytics, API keys or environment variables.
+
+- Live: https://talwarmohnish.github.io/Eclipse7.0/
+- Repository: https://github.com/talwarmohnish/Eclipse7.0
 
 ## Local setup
 
-Use Node.js 24 LTS and npm. From this project directory:
+Use Node.js 24 LTS and npm. From this directory:
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open the Local URL Vite prints (normally http://127.0.0.1:5173/).
+Open the Local URL Vite prints, normally http://127.0.0.1:5173/.
 
-## Production build and local preview
+## Build and preview
 
 ```sh
 npm run build
+npm run check:assets
 npm run preview -- --port 4173
 ```
 
-The build runs strict TypeScript checking and outputs the static site to `dist/`. Open http://127.0.0.1:4173/. `vite preview` is for local testing; deploy the `dist/` files to a static host.
+The build checks TypeScript and writes static files to `dist/`. Open http://127.0.0.1:4173/ for the production preview. The asset check serves and requests the production page and seven local assets under both `/` and `/Eclipse7.0/`.
 
-```sh
-npm run check:assets
-```
-
-This checks the actual production output and all local image/script/stylesheet/favicon references, then serves and requests those resources under both `/` and `/Eclipse7.0/` to catch deployment path problems.
-
-## Standalone local preview
-
-After building, run `npm run preview:standalone`. Open `outputs/ECLIPSE-preview.html` directly in your browser: CSS, JavaScript, images and favicon are embedded, so no web server or network connection is required. Event and contact links still open official external destinations. This is a generated preview; deploy `dist/` for production.
+For a server-free local preview, run `npm run preview:standalone` after building and open `outputs/ECLIPSE-preview.html`. It embeds the production JavaScript, stylesheet, images, favicon and font. External event/contact links still require their destinations. Deploy `dist/`, rather than this generated preview.
 
 ## Editing
 
-- `src/content.ts`: event facts, dates, registration URLs, FAQs, contact links and the placeholder track list.
-- `src/styles.css`: the `:root` block contains colours, fonts and page spacing; mobile rules follow desktop rules.
-- `src/main.tsx`: section composition, navigation and page copy.
-- `public/assets/`: bundled official ACM and Devfolio logos and the original procedural SVG moon.
-- `index.html`: title, description and theme metadata; update metadata if event dates change.
+- `src/content.ts`: verified event facts, dates, links, FAQs and unresolved content. Internal editing notes stay here, never in visitor-facing copy.
+- `src/main.tsx`: section layout, navigation, themes, hash alignment and interactions.
+- `src/Observatory.tsx`: original SVG lettering, deterministic full-page star field and pyramid roadmap.
+- `src/styles.css`: semantic colour tokens, typography, responsive rules and motion. Dark and light palettes are editable at the top and in theme overrides.
+- `public/assets/`: unchanged official ACM/Devfolio logos and original procedural SVG moon.
+- `index.html`: metadata and synchronous theme bootstrap.
 
-The ECLIPSE identity uses original SVG lettering in src/Observatory.tsx. Manrope variable 400–700 is bundled locally for body text and complementary headings. No third-party font service is contacted by visitors. The Manrope license is included in src/assets/fonts/. The unused Barlow source from the previous design is retained in history/source but is not included in the production bundle. All images are bundled locally; the official ACM logo is used without filtering, recolouring or redrawing. The moon is an original SVG illustration, not a photograph or official asset.
+Manrope variable 400–700 is bundled locally, with its SIL Open Font License in `src/assets/fonts/`. Original SVG paths form the ECLIPSE lettering; no official wordmark paths or font outlines were copied. The earlier Barlow font source is retained but is not bundled. Visitors make no third-party font requests.
 
-## GitHub
+The layered moon uses intermediate surface brightness, deep shadows and a restrained copper rim. Mobile has a separate overlapping composition. Static irregular stars span the entire document and cannot intercept clicks. Desktop roadmap badges coincide with SVG vertices; mobile uses compact pyramid geometry followed by a readable ordered list. Its once-only entrance animation does not represent event completion.
 
-Live website: https://talwarmohnish.github.io/Eclipse7.0/ . The source is published and the local folder is linked to origin/main. GitHub Actions passed dependency installation, production build, asset checks and Pages deployment. All published page, script, stylesheet, favicon and image resources returned HTTP 200.
+## Interactions and accessibility
 
-Target repository: https://github.com/talwarmohnish/Eclipse7.0
+- Dark is the first-visit default. The desktop/mobile header toggle remembers explicit choice under `eclipse-theme`. A head script applies it before CSS; unavailable storage does not prevent switching.
+- Native section anchors work on direct navigation and refresh. A React layout effect aligns targets after rendering and font loading, clearing the actual sticky header by 20px.
+- Mobile navigation has `aria-expanded`, hidden inactive links and Escape-to-close with focus restoration.
+- FAQs use native `details` / `summary` keyboard interactions. Semantic headings, skip link, image alternatives and visible focus styles are included.
+- Reduced-motion CSS disables reveals, diagram draws, radar sweeps, transitions and smooth scrolling. Essential text and the full roadmap remain visible when animations or IntersectionObserver are unavailable.
+- All pre-registration buttons use the verified official interest form. Full team registration remains unconfirmed.
 
-Commit application source, the lockfile, public assets, scripts, README and workflow. `.gitignore` excludes dependencies, build output, scratch files, logs, local hosting metadata and credentials. The project needs no `.env` file or secrets.
+## GitHub Pages deployment
 
-If pushing manually to an empty repository:
+Pages is configured for GitHub Actions. Push source changes to `main`; `.github/workflows/deploy.yml` installs locked dependencies, builds, checks production asset paths and deploys `dist/` automatically. You can also run **Actions → Deploy ECLIPSE to GitHub Pages → Run workflow**.
 
-```sh
-git init -b main
-git add .
-git commit -m "Build ECLIPSE 7.0 observatory frontend"
-git remote add origin https://github.com/talwarmohnish/Eclipse7.0.git
-git push -u origin main
-```
+For a new repository, enable **Settings → Pages → Build and deployment → Source → GitHub Actions**. The workflow uses GitHub’s automatic token; no personal token or repository secret is required. Use your ordinary authenticated Git tools to push changes. Never embed credentials in source or remote URLs.
 
-Authenticate using your normal GitHub tooling; never put access tokens into source files or remote URLs.
+Vite uses a relative base, so images, favicon, styles and fonts work under the repository path or at a domain root. Native fragment navigation needs no SPA rewrite rule. Keep the `assets/` directory beside production `index.html`.
 
-## Deploy with GitHub Pages
+`.gitignore` excludes `node_modules`, `dist`, scratch files, build caches, logs, credentials, `.env` files, local host metadata and generated preview archives/screenshots. Commit source, the lockfile, public assets, scripts, documentation and workflow.
 
-1. Open the repository’s **Settings → Pages**.
-2. Under **Build and deployment → Source**, choose **GitHub Actions**.
-3. Push to `main`, or open **Actions → Deploy ECLIPSE to GitHub Pages → Run workflow** after enabling Pages.
-4. The included workflow installs locked dependencies, checks TypeScript, builds `dist/`, checks asset paths, and deploys it. Its deployment output supplies the verified live URL.
+For other hosts, Vercel and Netlify configuration files are included. Use `npm run build` and publish `dist/`; no backend services are needed.
 
-Verified live URL: https://talwarmohnish.github.io/Eclipse7.0/ . Successful workflow: https://github.com/talwarmohnish/Eclipse7.0/actions/runs/41171141282 . Subsequent pushes to main automatically rebuild and redeploy.
+## Content provenance and remaining updates
 
-Relative Vite base and image/favicon paths support the repository subdirectory as well as domain-root deployment. Navigation uses native in-page anchors; no SPA rewrite rules are needed. The workflow uses GitHub’s automatic `GITHUB_TOKEN`, not a stored personal access token. Enabling Pages requires repository administration access and may need a manual settings change.
+Event facts and official assets come only from https://eclipse.acmthapar.in/. See `outputs/CONTENT-SOURCES.md` for provenance.
 
-Reference: https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
+Verified: 3–4 April 2027; TIET, Patiala; 24-hour in-person format; teams of 2–5; student eligibility; free participation for selected attendees; meals/resting areas; official contact/social links; Devfolio as platform partner; pre-registration, hackathon and results/closing milestones.
 
-## Other static hosts
+Awaiting confirmation: tracks/problem statements, final team registration link, detailed schedule/submission milestones, additional current sponsors and prizes. Visitor copy uses concise announcement notices. No unverified dates, sponsors, statistics, prizes or links were added.
 
-- **Vercel:** import the GitHub repository. Framework: Vite; build: `npm run build`; output: `dist`. `vercel.json` is included.
-- **Netlify:** import the repository. `netlify.toml` declares `npm run build`, `dist`, and Node 24. You can also upload the built `dist/` folder through its deployment UI.
-- **Other hosts:** publish the contents of `dist/` as static files, retaining the `assets/` directory.
+## Verification
 
-No environment variables or backend services are required. Reference: https://vite.dev/guide/static-deploy.html
-
-## Verified content and placeholders
-
-The only source of event facts and official assets is https://eclipse.acmthapar.in/. Details are documented in `outputs/CONTENT-SOURCES.md`.
-
-Verified: 3–4 April 2027, TIET Patiala, in-person 24-hour format, teams of 2–5, student eligibility, free participation for selected attendees, meals and resting areas, official contacts/social links, and Devfolio as platform partner.
-
-The Pre-register links open the official interest form in a new tab. No registration form or personal-data collection is implemented locally. Full team registration remains unconfirmed because the official source references multiple platforms.
-
-Editable placeholders remain for tracks/problem statements, a confirmed team application link, detailed schedule and submission milestones, additional current sponsors, and prizes. Historical sponsor logos and past track claims were intentionally excluded.
-
-## Accessibility and interactions
-
-- Mobile menu: native button, `aria-expanded`, hidden inactive links, Escape to close and return focus.
-- Section navigation and back-to-top: native anchors with sticky-header scroll offset.
-- FAQs: native `details` / `summary`, keyboard accessible and independently expandable.
-- Skip link, visible keyboard focus, semantic section headings and image alternatives.
-- Reduced-motion preferences disable smooth scrolling, transitions and the slow orbital animation.
-- Email, social, partner and pre-registration actions point to verified official destinations.
-
-The refined website was checked in both themes at 360, 390, 768 and 1440 pixel viewport widths. Mobile navigation, Escape/focus handling, keyboard FAQs, theme persistence, text sizing, dates, horizontal overflow and image/font loading were verified. The light-theme mobile title overlap was corrected. See `outputs/VERIFICATION.md` for the test record and reduced-motion emulation limit.
-
-
-
-
-## Observatory refinement
-
-- Dark is the first-visit default. The accessible header theme button is available on desktop and mobile. Explicit choice is saved under localStorage key `eclipse-theme`; a small head script applies it before the stylesheet loads. If storage is unavailable, theme switching still works for the current page.
-- Both palettes use semantic CSS tokens in `src/styles.css`. Official logos remain unchanged on navy plaques in the light theme.
-- The About diagram connects People, Ideas and Code to ECLIPSE and includes an ordinary text explanation and SVG description.
-- The roadmap uses only the verified pre-registration, 3 April hackathon and 4 April results/closing milestones. The path animation is an entrance illustration, not a measure of event completion. Mobile uses an ordinary vertical list.
-- The tracks radar runs two slow sweeps after entering view. Reduced-motion disables it, all reveals, path draws, transitions and smooth scrolling. Essential content is visible without animation support or IntersectionObserver.
-- Internal editing notes remain in `src/content.ts` and these documents; no EDITABLE PLACEHOLDER messages are rendered.
-- Dates use independently styled numerals and a smaller, spaced separator. The full accessible date remains 3–4 April 2027.
-
-Font sources: Google Fonts CSS API; Barlow Condensed and Manrope from https://github.com/google/fonts (SIL Open Font License). Only the Latin subsets required by this English page are bundled.
-
-
-## Layered identity and pyramid refinement
-
-Git history comparison used `3bdf772` (the first layered hero) and `e68a72e` (the later bright disc). The hero restores background placement with intermediate surface values, deeper shadows, a softer rim and a radial edge mask. Mobile uses its own overlapping composition; light-theme opacity keeps the dark wordmark legible.
-
-`src/Observatory.tsx` contains an original path-based ECLIPSE letter system, with matching extended strokes, curved notches, eclipse arcs and an integrated 7.0. The semantic h1 supplies the accessible event name; the SVG is decorative within it. No official wordmark or font glyph outlines were copied. Official ACM and Devfolio assets remain unchanged.
-
-The same file contains a deterministic, non-repeating 168-point star field spanning the full document. Stars are static, ignore pointer events and adapt to both palettes. Section tints are translucent so open areas retain stars. The star field does not attach scroll handlers or animate particles.
-
-The pyramid roadmap uses only the existing three milestones. Desktop HTML number badges coincide with the SVG vertices; the apex copy sits immediately above 02, while lower-left and lower-right copy attach directly to 01 and 03. Arrows establish the sequence. A once-only route draw is decorative and does not indicate event completion. Mobile pairs compact original geometry with a normal readable ordered list and an external pre-registration button.
-
-Direct fragment URLs are aligned in a layout effect after React commits, and again once local fonts settle. Hash changes close the mobile menu before aligning with the actual sticky-header height. No scroll hijacking or history rewriting is used.
+See `outputs/VERIFICATION.md` for the production and browser test record. Both themes were visually inspected at 360, 390, 768 and 1440px. Checks covered overflow, roadmap alignment, all requested direct/refreshed fragment URLs, menu/focus handling, keyboard FAQs, theme persistence, official pre-registration and local asset paths.
