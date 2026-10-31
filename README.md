@@ -102,7 +102,7 @@ Editable placeholders remain for tracks/problem statements, a confirmed team app
 - Reduced-motion preferences disable smooth scrolling, transitions and the slow orbital animation.
 - Email, social, partner and pre-registration actions point to verified official destinations.
 
-Browser verification completed at 1440, 768, 390 and 320 pixel viewport widths. Mobile menu, Escape/focus handling, section navigation, keyboard FAQ toggles and the official pre-registration destination were tested. Two mobile readability/overflow issues were corrected and redeployed. Details and verification limits are recorded in `outputs/VERIFICATION.md`.
+The refined website was checked in both themes at 360, 390, 768 and 1440 pixel viewport widths. Mobile navigation, Escape/focus handling, keyboard FAQs, theme persistence, text sizing, dates, horizontal overflow and image/font loading were verified. The light-theme mobile title overlap was corrected. See `outputs/VERIFICATION.md` for the test record and reduced-motion emulation limit.
 
 
 
@@ -118,3 +118,4 @@ Browser verification completed at 1440, 768, 390 and 320 pixel viewport widths. 
 - Dates use independently styled numerals and a smaller, spaced separator. The full accessible date remains 3–4 April 2027.
 
 Font sources: Google Fonts CSS API; Barlow Condensed and Manrope from https://github.com/google/fonts (SIL Open Font License). Only the Latin subsets required by this English page are bundled.
+
