@@ -20,3 +20,4 @@ Thumbs.db
 .netlify/
 .openai/
 outputs/*.zip
+outputs/*.html

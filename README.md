@@ -28,6 +28,10 @@ npm run check:assets
 
 This checks the actual production output and all local image/script/stylesheet/favicon references, then serves and requests those resources under both `/` and `/Eclipse7.0/` to catch deployment path problems.
 
+## Standalone local preview
+
+After building, run `npm run preview:standalone`. Open `outputs/ECLIPSE-preview.html` directly in your browser: CSS, JavaScript, images and favicon are embedded, so no web server or network connection is required. Event and contact links still open official external destinations. This is a generated preview; deploy `dist/` for production.
+
 ## Editing
 
 - `src/content.ts`: event facts, dates, registration URLs, FAQs, contact links and the placeholder track list.
@@ -39,6 +43,8 @@ This checks the actual production output and all local image/script/stylesheet/f
 The design uses system Arial/Helvetica and Courier New, with local fallbacks. No web font request or font service is needed. All images are bundled locally; the official ACM logo is used without filtering, recolouring or redrawing. The moon is an original SVG illustration, not a photograph or official asset.
 
 ## GitHub
+
+The implementation was published through the GitHub connection. The initial GitHub Actions run passed dependency installation, production build and both asset-path checks. Pages deployment requires the repository setting described below.
 
 Target repository: https://github.com/talwarmohnish/Eclipse7.0
 
@@ -97,3 +103,4 @@ Editable placeholders remain for tracks/problem statements, a confirmed team app
 - Email, social, partner and pre-registration actions point to verified official destinations.
 
 Browser QA status is recorded in `outputs/VERIFICATION.md`; production checks do not imply unperformed visual or interaction tests passed.
+

@@ -21,9 +21,17 @@ Desktop/mobile screenshots, real browser interaction tests, measured layout/over
 ## Local preview
 
 - Standard repeatable command: `npm run preview -- --port 4173` after `npm run build`.
-- A persistent local static preview was also started at http://127.0.0.1:4175/ serving `dist/`.
-- Browser reachability from the embedded preview was not established; if inaccessible, run the standard command in a local terminal and open the printed URL.
+- Local preview servers were started, but could not be reached across tool calls; no persistent server is claimed as available.
+- `npm run preview:standalone` generated `outputs/ECLIPSE-preview.html` with all assets embedded. Its embedded production JavaScript passed a syntax check and has no dynamic imports or import-meta dependency. Open this file directly, or run the standard Vite preview command in a local terminal.
 
 ## Remaining content
 
 Tracks/problem statements, final team registration platform/link, detailed schedule and submission milestones, additional current sponsors and prizes need organizer confirmation. Sources and editable fields are listed in `CONTENT-SOURCES.md`.
+
+## GitHub and CI
+
+- Source published to https://github.com/talwarmohnish/Eclipse7.0 on `main`.
+- Initial workflow run https://github.com/talwarmohnish/Eclipse7.0/actions/runs/41170076199 passed npm ci, the production build and asset checks on GitHub’s Ubuntu runner.
+- Initial deployment stopped because GitHub Pages was not enabled for the repository. The action reported “Get Pages site failed” / “Not Found.”
+- The workflow now separates successful build/upload from Pages configuration and deployment. Enable Settings → Pages → Source: GitHub Actions, then rerun the workflow.
+- Publication to GitHub does not imply a live Pages deployment has completed.
