@@ -44,7 +44,7 @@ The design uses system Arial/Helvetica and Courier New, with local fallbacks. No
 
 ## GitHub
 
-The implementation was published through the GitHub connection. The initial GitHub Actions run passed dependency installation, production build and both asset-path checks. Pages deployment requires the repository setting described below.
+Live website: https://talwarmohnish.github.io/Eclipse7.0/ . The source is published and the local folder is linked to origin/main. GitHub Actions passed dependency installation, production build, asset checks and Pages deployment. All published page, script, stylesheet, favicon and image resources returned HTTP 200.
 
 Target repository: https://github.com/talwarmohnish/Eclipse7.0
 
@@ -69,7 +69,7 @@ Authenticate using your normal GitHub tooling; never put access tokens into sour
 3. Push to `main`, or open **Actions → Deploy ECLIPSE to GitHub Pages → Run workflow** after enabling Pages.
 4. The included workflow installs locked dependencies, checks TypeScript, builds `dist/`, checks asset paths, and deploys it. Its deployment output supplies the verified live URL.
 
-Expected URL after a successful deployment: https://talwarmohnish.github.io/Eclipse7.0/ — this address is not a claim that deployment has completed.
+Verified live URL: https://talwarmohnish.github.io/Eclipse7.0/ . Successful workflow: https://github.com/talwarmohnish/Eclipse7.0/actions/runs/41170522692 . Subsequent pushes to main automatically rebuild and redeploy.
 
 Relative Vite base and image/favicon paths support the repository subdirectory as well as domain-root deployment. Navigation uses native in-page anchors; no SPA rewrite rules are needed. The workflow uses GitHub’s automatic `GITHUB_TOKEN`, not a stored personal access token. Enabling Pages requires repository administration access and may need a manual settings change.
 
@@ -103,4 +103,5 @@ Editable placeholders remain for tracks/problem statements, a confirmed team app
 - Email, social, partner and pre-registration actions point to verified official destinations.
 
 Browser QA status is recorded in `outputs/VERIFICATION.md`; production checks do not imply unperformed visual or interaction tests passed.
+
 

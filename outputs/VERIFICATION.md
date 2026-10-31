@@ -35,3 +35,11 @@ Tracks/problem statements, final team registration platform/link, detailed sched
 - Initial deployment stopped because GitHub Pages was not enabled for the repository. The action reported “Get Pages site failed” / “Not Found.”
 - The workflow now separates successful build/upload from Pages configuration and deployment. Enable Settings → Pages → Source: GitHub Actions, then rerun the workflow.
 - Publication to GitHub does not imply a live Pages deployment has completed.
+
+## Verified live deployment
+
+GitHub Actions run https://github.com/talwarmohnish/Eclipse7.0/actions/runs/41170522692 completed successfully, including the build job and the Pages deployment job. The deployment log returned https://talwarmohnish.github.io/Eclipse7.0/ as its environment URL and reported success.
+
+The live URL returned HTTP 200 with the correct ECLIPSE 7.0 document title. Its JavaScript bundle, stylesheet, favicon, official ACM logo, Devfolio logo and original moon SVG all returned HTTP 200. The website uses system fonts with no remote font dependency.
+
+The initial Pages setup blocker has been resolved. The local project now has an origin remote and tracks origin/main. Generated preview HTML and production ZIP are ignored by Git. Browser layout and real interaction testing remain unverified as described above.

@@ -21,3 +21,4 @@ Thumbs.db
 .openai/
 outputs/*.zip
 outputs/*.html
+outputs/README.md
