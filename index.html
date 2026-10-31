@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="theme-color" content="#080e19"/>
-  <script>(function(){var theme='dark';try{if(localStorage.getItem('eclipse-theme')==='light')theme='light';}catch(e){}document.documentElement.dataset.theme=theme;document.documentElement.style.colorScheme=theme;})();</script>
+  <script>(function(){var theme='dark';try{if(localStorage.getItem('eclipse-theme')==='light')theme='light';}catch(e){}document.documentElement.dataset.theme=theme;document.documentElement.style.colorScheme=theme;document.querySelector('meta[name="theme-color"]').setAttribute('content',theme==='light'?'#f6f2e9':'#080e19');})();</script>
   <meta name="description" content="ECLIPSE 7.0 — ACM Thapar’s flagship 24-hour hackathon. 3–4 April 2027 at TIET, Patiala. Build together. Make it real."/>
   <title>ECLIPSE 7.0 — The seventh alignment</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg"/>
