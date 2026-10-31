@@ -1,48 +1,59 @@
-# Layered observatory refinement — verification
+# Interaction polish — verification
 
 31 October 2026
 
-## Completed design
+## Changes
 
-- Preserved readable Manrope body/FAQ text and existing verified event content, logos, dates and interactions.
-- Restored the original layered moon composition using history comparison (`3bdf772` versus `e68a72e`). Intermediate surface brightness, deep shadow, copper rim and a softer radial edge integrate it behind original ECLIPSE lettering. Mobile has deliberate overlap.
-- Added original SVG lettering with coherent extended forms, curved cuts, eclipse arcs and integrated 7.0. The semantic h1 remains ECLIPSE 7.0.
-- Added 168 static irregular stars across the full document, with dark/light colours and pointer-events disabled. Every main section contains stars; no repeating tile or particle animation is used.
-- Replaced the orbital roadmap with a wireframe pyramid: pre-registration lower left, hackathon apex, results/closing lower right. HTML number badges and readable copy attach to the actual vertices. Mobile uses compact geometry and a normal ordered list, with a prominent official Pre-register action.
-- Removed the internal journey caption. Fixed a missing space in the FAQ heading when its line break is hidden on tablet.
-- Preserved both themes, first-visit dark default, local choice persistence and pre-paint theme bootstrap.
+- Duration statistic is visually `24 hr`, with baseline-aligned units and a screen-reader-only `24 hours` label. Prose still says `24-hour hackathon`.
+- Fresh plain URLs start at the hero. Initial explicit fragments align after React commits and local fonts settle. Measured CSS scroll-padding handles subsequent native anchors; hash changes no longer force scrolling. Browser history and scrollRestoration remain untouched.
+- Radar uses a single infinite 14-second CSS animation. IntersectionObserver and document visibility only change its play-state, retaining rotation phase. Reduced-motion shows a static sweep.
+- Pyramid illustration responds to fine mouse pointers within its open illustration area, with a maximum 4-degree tilt. Pointer work is coalesced into one animation frame. Pointer exit, scrolling or media-preference changes reset tilt. Text, numbered controls and registration button remain stationary.
+- Milestone proximity highlights the node, corresponding route and description. Numbered buttons and the registration link provide keyboard focus highlighting. Mobile retains its static geometry and readable ordered list.
+- About nodes and labels highlight only their existing connection, node and label. No controls, movement or new geometry were added. Shape/text attributes were compared with the previous source and matched exactly.
+- Desktop pyramid height reduced from 740px to 620px (660px at 901–1150px), with tighter section spacing. Mobile spacing remains readable.
+- Existing moon asset, wordmark paths, seeded stars, palettes, official logos, theme bootstrap and event information are preserved. Source checks confirmed event content, moon and index metadata unchanged.
 
-## Production checks
+## Production
 
-- Strict TypeScript and Vite production build passed.
-- Page and all seven production resources passed HTTP/MIME checks under both `/` and `/Eclipse7.0/`.
-- Exactly one locally bundled font is included: Manrope. Official logo images, original moon SVG and favicon are local.
-- Standalone preview generation passed: 363,076 bytes, embedded assets and syntactically valid production JavaScript.
-- GitHub Pages deployment of the identity/pyramid design passed: https://github.com/talwarmohnish/Eclipse7.0/actions/runs/41187297949 . The final heading-space/documentation patch uses the same automatic workflow.
+- Strict TypeScript / Vite production build passed.
+- Seven local production resources passed HTTP/MIME checks under both `/` and `/Eclipse7.0/`.
+- Live HTML, JavaScript, CSS, favicon, logos, moon and Manrope font returned HTTP 200.
+- Standalone preview passed embedded-asset and JavaScript syntax checks: 369,831 bytes. Production ZIP refreshed.
+- Interaction deployment passed: https://github.com/talwarmohnish/Eclipse7.0/actions/runs/41191067874 . Documentation is published through the same existing workflow.
 
 ## Browser checks
 
-Browser testing used the deployed HTTPS production site. Dark and light were inspected at 360, 390, 768 and 1440px; screenshots are saved locally in outputs.
+Dark and light themes were inspected at 360, 390, 768 and 1440px widths. Screenshots are saved locally in outputs.
 
 | Check | Result |
 | --- | --- |
-| Horizontal overflow, all eight theme/width combinations | No document overflow; no heading, paragraph, link or FAQ question outside the content viewport |
-| Text sizing | Body 16px on mobile/tablet, 17px desktop; FAQ questions 18px mobile/tablet, 19px desktop |
-| Desktop pyramid vertices | All three badge centres match SVG vertices within 0.01px |
-| Mobile roadmap | Compact triangle plus readable full milestone list; all descriptions and action available without hover |
-| Star distribution | Every main section contains points; static, theme appropriate and noninteractive |
-| Mobile navigation | Opens/closes; Escape restores focus; Roadmap link closes menu and aligns the section |
-| FAQ | Pointer opening and keyboard Enter collapse passed |
-| Theme | Pointer and keyboard switching, and reload persistence passed |
-| Pre-registration | Pyramid action opens the verified official interest form; no form submitted |
+| Horizontal overflow | All eight theme/width combinations passed; document width equals content viewport; no text, link or FAQ question overflows |
+| Typography | Body 16px mobile/tablet, 17px desktop; FAQ questions 18px mobile/tablet, 19px desktop |
+| Duration accessibility | Accessibility tree exposes `24 hours`; visible numeral/unit use baseline alignment |
+| Fresh homepage | New plain-URL tab opened at scrollY 0 with the hero below the header |
+| Direct fragments and reload | 32 checks passed: four sections × four widths × both themes; all requested sections clear the header |
+| Native Back | Arbitrary `#about` scroll position restored exactly: 1765.5999755859375px |
+| Native Forward | Prior `#faqs` position restored exactly: 4056.800048828125px |
+| Plain-URL reload | A scrolled plain URL retained 4214.39990234375px rather than being forced to the hero |
+| Radar beyond 30 seconds | Still running and changing rotation after 45.3 seconds continuously visible |
+| Radar offscreen/resume | Paused offscreen; identical transform in separated samples; resumed rotation on return |
+| Pointer tilt | Measured approximately -0.78deg X / 3.57deg Y; route/node/description highlight active near milestone 3 |
+| Text/click stability | All description and registration-button rectangles, plus scrollY, identical before/after native pointer input |
+| Reset | Pointer exit restored both tilt variables to 0deg and cleared pointer highlight |
+| Keyboard | Milestone 1 → registration link → milestone 2 focus updates highlighting; mobile milestone activation also highlights its route |
+| About | Each node/label activates only its corresponding connection; diagram transform remains none |
+| Mobile menu | Opens/closes, Escape returns focus, section link closes menu and clears the sticky header |
+| FAQs | Pointer and Enter open/close passed in both themes |
+| Theme | Pointer/Enter toggling and persistence across repeated reloads passed |
+| Registration | Roadmap action opens the official pre-registration form in a new tab |
 | Console | No warnings or errors recorded |
 
-32 fragment tests passed: `#about`, `#tracks`, `#timeline`, `#faqs` × direct navigation and reload × both themes × desktop 1440px and mobile 390px. Section starts clear the sticky header by approximately 20px after React rendering and local-font loading. Header height is measured at runtime. Navigation uses ordinary anchors without scroll hijacking.
+Native accessibility actions were used to verify history restoration because the locator-click automation scrolls elements into view before activating them; that test-tool behaviour changes the position stored in history.
 
-The large date separator has independent sizing/spacing. Original ACM/Devfolio assets remain unchanged and legible in both themes. Visitors see announcement notices instead of internal editing instructions.
+## Verification limits
 
-## Verification limits and pending content
+The browser environment kept documents visible even when another tab was opened, so an actual hidden-tab transition could not be induced reliably. The document.visibilitychange listener and pause/resume CSS were inspected; hidden-tab behaviour is implemented but not claimed as behaviourally verified. OS reduced-motion emulation was unavailable; its explicit static-radar/no-tilt rules and global animation overrides were inspected.
 
-The browser tool cannot open the standalone local file or reach the sandboxed local server. Its generated HTML/assets/JavaScript were checked by the build scripts; the matching production bundle was visually tested on HTTPS. Operating-system reduced-motion emulation was unavailable; the CSS rules were inspected and disable all motion while retaining essential content.
+The browser cannot reach the sandboxed local server or open the standalone file. Local production HTTP/asset tests and standalone validation passed; visual and interaction testing used the matching deployed HTTPS bundle. No registration form was submitted.
 
-Tracks/problem statements, full schedule, final team registration, additional sponsors and prizes remain unconfirmed. They remain documented in the content file and README; no details were invented.
+Unconfirmed tracks, detailed schedule, final team registration link, additional sponsors and prizes remain concise announcement notices. No event facts or links were invented.
