@@ -15,10 +15,25 @@ function DateRange({ large = false }: { large?: boolean }) {
   return <time className={`date-block ${large ? 'date-large' : ''}`} dateTime="2027-04-03" aria-label={event.shortDate}><span className="date-numerals" aria-hidden="true"><span>{event.startNumber}</span><span className="date-separator">—</span><span>{event.endNumber}</span></span><span className="date-month" aria-hidden="true">{event.monthYear}</span></time>;
 }
 function Alignment() {
-  return <figure className="alignment reveal"><svg viewBox="0 0 600 430" role="img" aria-labelledby="alignment-title alignment-desc"><title id="alignment-title">The ECLIPSE alignment</title><desc id="alignment-desc">People, Ideas and Code converge at ECLIPSE. Each perspective contributes to a shared project.</desc><circle className="diagram-orbit" cx="300" cy="211" r="144"/><ellipse className="diagram-orbit" cx="300" cy="211" rx="235" ry="76" transform="rotate(-25 300 211)"/><g className="alignment-routes"><path pathLength="1" d="M112 104 Q275 63 300 211"/><path pathLength="1" d="M495 134 Q445 280 300 211"/><path pathLength="1" d="M231 366 Q175 245 300 211"/></g><g className="diagram-core"><circle cx="300" cy="211" r="65"/><circle className="core-rim" cx="300" cy="211" r="65"/><text x="300" y="207" textAnchor="middle">ECLIPSE</text><text className="core-edition" x="300" y="233" textAnchor="middle">7.0</text></g><g className="alignment-node"><circle cx="112" cy="104" r="9"/><text x="78" y="76">PEOPLE</text><circle cx="495" cy="134" r="9"/><text x="458" y="108">IDEAS</text><circle cx="231" cy="366" r="9"/><text x="201" y="402">CODE</text></g><path className="diagram-cross" d="M465 333h16m-8-8v16M80 270h12m-6-6v12"/></svg><figcaption>Different perspectives. One shared build.</figcaption></figure>;
+  return <figure className="alignment reveal"><svg viewBox="0 0 600 430" role="img" aria-labelledby="alignment-title alignment-desc"><title id="alignment-title">The ECLIPSE alignment</title><desc id="alignment-desc">People, Ideas and Code converge at ECLIPSE. Each perspective contributes to a shared project.</desc><circle className="diagram-orbit" cx="300" cy="211" r="144"/><ellipse className="diagram-orbit" cx="300" cy="211" rx="235" ry="76" transform="rotate(-25 300 211)"/><g className="alignment-routes"><path className="alignment-route-people" pathLength="1" d="M112 104 Q275 63 300 211"/><path className="alignment-route-ideas" pathLength="1" d="M495 134 Q445 280 300 211"/><path className="alignment-route-code" pathLength="1" d="M231 366 Q175 245 300 211"/></g><g className="diagram-core"><circle cx="300" cy="211" r="65"/><circle className="core-rim" cx="300" cy="211" r="65"/><text x="300" y="207" textAnchor="middle">ECLIPSE</text><text className="core-edition" x="300" y="233" textAnchor="middle">7.0</text></g><g className="alignment-node"><g className="alignment-people"><circle cx="112" cy="104" r="9"/><text x="78" y="76">PEOPLE</text></g><g className="alignment-ideas"><circle cx="495" cy="134" r="9"/><text x="458" y="108">IDEAS</text></g><g className="alignment-code"><circle cx="231" cy="366" r="9"/><text x="201" y="402">CODE</text></g></g><path className="diagram-cross" d="M465 333h16m-8-8v16M80 270h12m-6-6v12"/></svg><figcaption>Different perspectives. One shared build.</figcaption></figure>;
 }
 function Radar() {
-  return <div className="radar" aria-hidden="true"><div className="radar-grid"/><div className="radar-sweep"/><div className="radar-ring ring-one"/><div className="radar-ring ring-two"/><div className="radar-ring ring-three"/><span className="radar-center">✦</span><span className="radar-point"/><span className="radar-axis">N</span></div>;
+  const radar = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const element = radar.current;
+    if (!element) return;
+    let visible = !('IntersectionObserver' in window);
+    const update = () => { element.dataset.running = String(visible && !document.hidden); };
+    const observer = 'IntersectionObserver' in window ? new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      update();
+    }, { threshold: 0 }) : null;
+    observer?.observe(element);
+    document.addEventListener('visibilitychange', update);
+    update();
+    return () => { observer?.disconnect(); document.removeEventListener('visibilitychange', update); };
+  }, []);
+  return <div ref={radar} className="radar" data-running="false" aria-hidden="true"><div className="radar-grid"/><div className="radar-sweep"/><div className="radar-ring ring-one"/><div className="radar-ring ring-two"/><div className="radar-ring ring-three"/><span className="radar-center">✦</span><span className="radar-point"/><span className="radar-axis">N</span></div>;
 }
 const links = [['About', 'about'], ['Tracks', 'tracks'], ['Roadmap', 'timeline'], ['Partners', 'sponsors'], ['FAQs', 'faqs']];
 const milestones = [
@@ -52,30 +67,48 @@ function App() {
     document.querySelectorAll('.reveal').forEach(section => reveal.observe(section));
     return () => { observer.disconnect(); reveal.disconnect(); };
   }, []);
-  // Native hash targets do not exist until React commits. Align immediately,
-  // then re-align after local fonts settle so direct URLs and refreshes are reliable.
+  // Initial targets do not exist until React commits. Leave history traversal
+  // and bfcache restoration to the browser; ordinary anchors use scroll-padding.
   useLayoutEffect(() => {
     let disposed = false;
-    let frame = 0;
-    const alignHash = () => {
-      if (disposed || !window.location.hash) return;
+    let interacted = false;
+    const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+    const initialHash = window.location.hash;
+    const updateOffset = () => {
+      const height = document.querySelector('.nav-shell')?.getBoundingClientRect().height ?? 88;
+      document.documentElement.style.setProperty('--anchor-offset', String(height + 21) + 'px');
+    };
+    updateOffset();
+    const resize = new ResizeObserver(updateOffset);
+    const header = document.querySelector('.nav-shell');
+    if (header) resize.observe(header);
+    const markInteraction = () => { interacted = true; };
+    const inputs = ['wheel', 'pointerdown', 'touchstart', 'keydown'] as const;
+    inputs.forEach(type => window.addEventListener(type, markInteraction, { passive: true }));
+    const alignInitial = () => {
+      if (disposed || interacted || nav?.type === 'back_forward' || window.location.hash !== initialHash) return;
+      if (!initialHash) {
+        if (nav?.type === 'navigate') window.scrollTo({ top: 0, behavior: 'instant' });
+        return;
+      }
       let id: string;
-      try { id = decodeURIComponent(window.location.hash.slice(1)); } catch { return; }
+      try { id = decodeURIComponent(initialHash.slice(1)); } catch { return; }
       const target = document.getElementById(id);
       if (!target) return;
-      const header = document.querySelector('.site-header')?.getBoundingClientRect().height ?? 88;
-      const top = Math.max(0, window.scrollY + target.getBoundingClientRect().top - header - 20);
+      const offset = Number.parseFloat(document.documentElement.style.getPropertyValue('--anchor-offset'));
+      const top = Math.max(0, window.scrollY + target.getBoundingClientRect().top - offset);
       window.scrollTo({ top, behavior: 'instant' });
     };
-    const onHash = () => {
-      setMenuOpen(false);
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(alignHash);
-    };
-    alignHash();
-    document.fonts?.ready.then(alignHash);
+    const onHash = () => setMenuOpen(false);
+    alignInitial();
+    document.fonts?.ready.then(alignInitial);
     window.addEventListener('hashchange', onHash);
-    return () => { disposed = true; cancelAnimationFrame(frame); window.removeEventListener('hashchange', onHash); };
+    return () => {
+      disposed = true;
+      resize.disconnect();
+      inputs.forEach(type => window.removeEventListener(type, markInteraction));
+      window.removeEventListener('hashchange', onHash);
+    };
   }, []);
   const preregister = <a className="button button-primary" href={event.preRegistration} target="_blank" rel="noopener noreferrer">Pre-register <Arrow diagonal/></a>;
   return <div className="site-shell">
@@ -96,7 +129,7 @@ function App() {
         <div className="hero-copy"><h1 id="hero-title"><span className="sr-only">{event.name} {event.edition}</span><EclipseWordmark/></h1><div className="edition-line"><span>24-HOUR HACKATHON</span></div><p className="hero-lead">Build together.<br/>Make it real.</p><p className="hero-description">ACM Thapar’s flagship hackathon brings student developers, designers, and innovators together — in person, for 24 hours.</p><div className="hero-actions">{preregister}<a className="button button-text" href="#about">Explore the event <Arrow down/></a></div></div>
         <div className="hero-info"><DateRange/><div className="hero-place"><span className="field-label">EVENT VENUE</span><strong>{event.venue}</strong><span>In person</span></div><a className="scroll-cue" href="#about">Discover ECLIPSE <Arrow down/></a></div>
       </section>
-      <section className="about section-shell" id="about" aria-labelledby="about-title"><div className="about-layout"><div className="about-copy reveal"><Label number="01">THE ALIGNMENT</Label><h2 id="about-title">People.<br/>Ideas. Code.</h2><p className="section-lead">The best projects start when different perspectives meet.</p><p>ECLIPSE 7.0 is ACM Thapar Student Chapter’s 24-hour hackathon. Bring your skills and curiosity to a team of 2–5, collaborate in person, and turn an idea into a working project.</p><a className="inline-link" href="#faqs">Who can participate? <Arrow/></a></div><Alignment/></div><div className="facts-strip"><div><strong>24<span>H</span></strong><p>To build together</p></div><div><strong>2–5</strong><p>People per team</p></div><div><strong>In person</strong><p>TIET, Patiala</p></div></div></section>
+      <section className="about section-shell" id="about" aria-labelledby="about-title"><div className="about-layout"><div className="about-copy reveal"><Label number="01">THE ALIGNMENT</Label><h2 id="about-title">People.<br/>Ideas. Code.</h2><p className="section-lead">The best projects start when different perspectives meet.</p><p>ECLIPSE 7.0 is ACM Thapar Student Chapter’s 24-hour hackathon. Bring your skills and curiosity to a team of 2–5, collaborate in person, and turn an idea into a working project.</p><a className="inline-link" href="#faqs">Who can participate? <Arrow/></a></div><Alignment/></div><div className="facts-strip"><div><strong className="duration-stat"><span className="sr-only">24 hours</span><span aria-hidden="true">24</span><span className="duration-unit" aria-hidden="true">hr</span></strong><p>To build together</p></div><div><strong>2–5</strong><p>People per team</p></div><div><strong>In person</strong><p>TIET, Patiala</p></div></div></section>
       <section className="tracks section-shell" id="tracks" aria-labelledby="tracks-title"><div className="section-heading reveal"><div><Label number="02">FIND YOUR DIRECTION</Label><h2 id="tracks-title">A signal on the horizon.</h2></div><p>Bring an open mind.<br/>Your challenge will follow.</p></div>{event.tracks ? <div className="published-tracks">{event.tracks.map(track=><article key={track.title}><h3>{track.title}</h3><p>{track.description}</p></article>)}</div> : <div className="tracks-signal reveal"><div className="signal-art"><Radar/><span className="signal-coordinate" aria-hidden="true">SIGNAL / 07.0</span></div><div className="signal-copy"><span className="field-label signal-status"><span className="status-dot"/> AWAITING TRANSMISSION</span><h3>Tracks announced soon</h3><p>Official tracks and problem statements are still to be revealed. Follow ACM Thapar for announcements from the organizers.</p><a className="inline-link" href={event.instagram} target="_blank" rel="noopener noreferrer">Follow the announcements <Arrow diagonal/></a></div></div>}</section>
       <section className="timeline section-shell" id="timeline" aria-labelledby="timeline-title"><div className="roadmap-heading reveal"><div><Label number="03">YOUR EVENT ROADMAP</Label><h2 id="timeline-title">Three points.<br/>One shared journey.</h2><p>From registering your interest to the final day.<br/>Full schedule announced soon.</p></div><div className="roadmap-date"><span className="field-label">THE MAIN EVENT</span><DateRange large/></div></div><PyramidRoadmap milestones={milestones}/></section>
       <section className="sponsors section-shell" id="sponsors" aria-labelledby="sponsors-title"><Label number="04">OUR PLATFORM PARTNER</Label><div className="sponsor-layout"><div className="reveal"><h2 id="sponsors-title">Supporting<br/>student builders.</h2><p>Devfolio is listed as the platform partner<br/>on the official ECLIPSE 7.0 website.</p></div><a className="partner-logo" href="https://devfolio.co" target="_blank" rel="noopener noreferrer" aria-label="Visit Devfolio"><img src="./assets/devfolio.svg" alt="Devfolio" width="230" height="54"/><Arrow diagonal/></a></div><div className="partner-invite"><div><h3>Help students build what’s next.</h3><p>Talk to ACM Thapar about partnering with ECLIPSE 7.0.</p></div><a className="button button-outline" href={`mailto:${event.partnership}?subject=ECLIPSE%207.0%20Partnership`}>Become a partner <Arrow diagonal/></a></div></section>

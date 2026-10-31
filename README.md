@@ -39,15 +39,15 @@ For a server-free local preview, run `npm run preview:standalone` after building
 
 Manrope variable 400–700 is bundled locally, with its SIL Open Font License in `src/assets/fonts/`. Original SVG paths form the ECLIPSE lettering; no official wordmark paths or font outlines were copied. The earlier Barlow font source is retained but is not bundled. Visitors make no third-party font requests.
 
-The layered moon uses intermediate surface brightness, deep shadows and a restrained copper rim. Mobile has a separate overlapping composition. Static irregular stars span the entire document and cannot intercept clicks. Desktop roadmap badges coincide with SVG vertices; mobile uses compact pyramid geometry followed by a readable ordered list. Its once-only entrance animation does not represent event completion.
+The layered moon uses intermediate surface brightness, deep shadows and a restrained copper rim. Mobile has a separate overlapping composition. Static irregular stars span the entire document and cannot intercept clicks. Desktop roadmap badges coincide with SVG vertices; mobile uses compact pyramid geometry followed by a readable ordered list. Its once-only entrance animation does not represent event completion. Fine-pointer devices get up to 4 degrees of illustration-only tilt and proximity highlights. Number controls and the pre-registration link provide keyboard highlighting; text and buttons remain stationary. About nodes only highlight their existing connections without moving or adding controls.
 
 ## Interactions and accessibility
 
 - Dark is the first-visit default. The desktop/mobile header toggle remembers explicit choice under `eclipse-theme`. A head script applies it before CSS; unavailable storage does not prevent switching.
-- Native section anchors work on direct navigation and refresh. A React layout effect aligns targets after rendering and font loading, clearing the actual sticky header by 20px.
+- Native section anchors work on direct navigation and refresh. Initial explicit fragments align after rendering and font loading. A measured scroll-padding offset clears the sticky header. Fresh plain URLs start at the hero; Back/Forward and reload restoration remain browser-managed.
 - Mobile navigation has `aria-expanded`, hidden inactive links and Escape-to-close with focus restoration.
 - FAQs use native `details` / `summary` keyboard interactions. Semantic headings, skip link, image alternatives and visible focus styles are included.
-- Reduced-motion CSS disables reveals, diagram draws, radar sweeps, transitions and smooth scrolling. Essential text and the full roadmap remain visible when animations or IntersectionObserver are unavailable.
+- The radar loops while intersecting the viewport and the document is visible; CSS play-state pauses/resumes the same animation. Reduced-motion CSS disables reveals, diagram draws, radar sweeps, transitions, pyramid tilt and smooth scrolling. Essential text and the full roadmap remain visible when animations or IntersectionObserver are unavailable.
 - All pre-registration buttons use the verified official interest form. Full team registration remains unconfirmed.
 
 ## GitHub Pages deployment
