@@ -44,7 +44,7 @@ The layered moon uses intermediate surface brightness, deep shadows and a restra
 ## Interactions and accessibility
 
 - Dark is the first-visit default. The desktop/mobile header toggle remembers explicit choice under `eclipse-theme`. A head script applies it before CSS; unavailable storage does not prevent switching.
-- Native section anchors work on direct navigation and refresh. Initial explicit fragments align after rendering and font loading. A measured scroll-padding offset clears the sticky header. Fresh plain URLs start at the hero; Back/Forward and reload restoration remain browser-managed.
+- Native section anchors work during the visit, and fresh explicit deep links still align after rendering and font loading. Every full reload removes the fragment with replaceState and opens at the hero. A pre-render bootstrap blocks native scroll restoration until the reload is complete; React reveals the hero at scroll zero and skips delayed fragment alignment for that reload. Normal restoration is then re-enabled for Back/Forward. A measured scroll-padding offset clears the sticky header for section links.
 - Mobile navigation has `aria-expanded`, hidden inactive links and Escape-to-close with focus restoration.
 - FAQs use native `details` / `summary` keyboard interactions. Semantic headings, skip link, image alternatives and visible focus styles are included.
 - The radar loops while intersecting the viewport and the document is visible; CSS play-state pauses/resumes the same animation. Reduced-motion CSS disables reveals, diagram draws, radar sweeps, transitions, pyramid tilt and smooth scrolling. Essential text and the full roadmap remain visible when animations or IntersectionObserver are unavailable.

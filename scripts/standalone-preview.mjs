@@ -27,7 +27,9 @@ html = html.replace('./favicon.svg', `data:image/svg+xml;base64,${(await readFil
 const embeddedScript = html.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
 new Script(embeddedScript); // Verify embedding did not corrupt the production JavaScript.
 assert(!html.includes('src="./assets/'), 'No external bundle dependency');
-assert.equal((html.replace(/<script type=\"module\">[\s\S]*?<\/script>/, '').match(/<script(?:\s|>)/g) || []).length, 1, 'Theme bootstrap remains alongside the application script');
+const bootstraps = [...html.replace(/<script type="module">[\s\S]*?<\/script>/, '').matchAll(/<script>([\s\S]*?)<\/script>/g)];
+assert.equal(bootstraps.length, 2, 'Reload and theme bootstraps remain alongside the application script');
+for (const [, bootstrap] of bootstraps) new Script(bootstrap);
 await mkdir('outputs', { recursive: true });
 await writeFile('outputs/ECLIPSE-preview.html', html);
 console.log(`PASS: standalone local preview, ${(await stat('outputs/ECLIPSE-preview.html')).size} bytes, embedded assets and syntactically valid production JavaScript.`);

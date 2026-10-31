@@ -67,13 +67,31 @@ function App() {
     document.querySelectorAll('.reveal').forEach(section => reveal.observe(section));
     return () => { observer.disconnect(); reveal.disconnect(); };
   }, []);
-  // Initial targets do not exist until React commits. Leave history traversal
-  // and bfcache restoration to the browser; ordinary anchors use scroll-padding.
+  // Reloads start at the hero; fresh deep links and in-visit anchors still work.
+  // History traversal and bfcache restoration remain browser-managed.
   useLayoutEffect(() => {
     let disposed = false;
     let interacted = false;
     const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
     const initialHash = window.location.hash;
+    const reloading = nav?.type === 'reload' || document.documentElement.hasAttribute('data-reload-top');
+    let restoreFrame = 0;
+    const previousRestoration = document.documentElement.dataset.reloadRestoration === 'manual' ? 'manual' : 'auto';
+    const restoreScrollMode = () => {
+      restoreFrame = requestAnimationFrame(() => {
+        history.scrollRestoration = previousRestoration;
+        delete document.documentElement.dataset.reloadRestoration;
+      });
+    };
+    if (reloading) {
+      // The head script already removed the fragment and blocked native restoration.
+      // Reveal the committed hero at zero before the browser can paint this frame.
+      history.scrollRestoration = 'manual';
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      delete document.documentElement.dataset.reloadTop;
+      if (document.readyState === 'complete') restoreScrollMode();
+      else window.addEventListener('pageshow', restoreScrollMode, { once: true });
+    }
     const updateOffset = () => {
       const height = document.querySelector('.nav-shell')?.getBoundingClientRect().height ?? 88;
       document.documentElement.style.setProperty('--anchor-offset', String(height + 21) + 'px');
@@ -86,7 +104,7 @@ function App() {
     const inputs = ['wheel', 'pointerdown', 'touchstart', 'keydown'] as const;
     inputs.forEach(type => window.addEventListener(type, markInteraction, { passive: true }));
     const alignInitial = () => {
-      if (disposed || interacted || nav?.type === 'back_forward' || window.location.hash !== initialHash) return;
+      if (disposed || interacted || reloading || nav?.type === 'back_forward' || window.location.hash !== initialHash) return;
       if (!initialHash) {
         if (nav?.type === 'navigate') window.scrollTo({ top: 0, behavior: 'instant' });
         return;
@@ -106,6 +124,11 @@ function App() {
     return () => {
       disposed = true;
       resize.disconnect();
+      if (reloading) {
+        cancelAnimationFrame(restoreFrame);
+        window.removeEventListener('pageshow', restoreScrollMode);
+        history.scrollRestoration = previousRestoration;
+      }
       inputs.forEach(type => window.removeEventListener(type, markInteraction));
       window.removeEventListener('hashchange', onHash);
     };
