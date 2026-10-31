@@ -40,7 +40,7 @@ After building, run `npm run preview:standalone`. Open `outputs/ECLIPSE-preview.
 - `public/assets/`: bundled official ACM and Devfolio logos and the original procedural SVG moon.
 - `index.html`: title, description and theme metadata; update metadata if event dates change.
 
-The design uses system Arial/Helvetica and Courier New, with local fallbacks. No web font request or font service is needed. All images are bundled locally; the official ACM logo is used without filtering, recolouring or redrawing. The moon is an original SVG illustration, not a photograph or official asset.
+The design bundles Barlow Condensed 600 and Manrope variable 400–700 as local WOFF2 files. No third-party font service is contacted by visitors. Font licenses are included in src/assets/fonts/. All images are bundled locally; the official ACM logo is used without filtering, recolouring or redrawing. The moon is an original SVG illustration, not a photograph or official asset.
 
 ## GitHub
 
@@ -106,3 +106,15 @@ Browser verification completed at 1440, 768, 390 and 320 pixel viewport widths. 
 
 
 
+
+## Observatory refinement
+
+- Dark is the first-visit default. The accessible header theme button is available on desktop and mobile. Explicit choice is saved under localStorage key `eclipse-theme`; a small head script applies it before the stylesheet loads. If storage is unavailable, theme switching still works for the current page.
+- Both palettes use semantic CSS tokens in `src/styles.css`. Official logos remain unchanged on navy plaques in the light theme.
+- The About diagram connects People, Ideas and Code to ECLIPSE and includes an ordinary text explanation and SVG description.
+- The roadmap uses only the verified pre-registration, 3 April hackathon and 4 April results/closing milestones. The path animation is an entrance illustration, not a measure of event completion. Mobile uses an ordinary vertical list.
+- The tracks radar runs two slow sweeps after entering view. Reduced-motion disables it, all reveals, path draws, transitions and smooth scrolling. Essential content is visible without animation support or IntersectionObserver.
+- Internal editing notes remain in `src/content.ts` and these documents; no EDITABLE PLACEHOLDER messages are rendered.
+- Dates use independently styled numerals and a smaller, spaced separator. The full accessible date remains 3–4 April 2027.
+
+Font sources: Google Fonts CSS API; Barlow Condensed and Manrope from https://github.com/google/fonts (SIL Open Font License). Only the Latin subsets required by this English page are bundled.

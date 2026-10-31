@@ -1,5 +1,5 @@
 import { readFile, writeFile, mkdir, stat } from 'node:fs/promises';
-import { resolve, join } from 'node:path';
+import { resolve, join, dirname } from 'node:path';
 import { Script } from 'node:vm';
 import assert from 'node:assert/strict';
 
@@ -14,14 +14,21 @@ for (const asset of ['acm-logo.png', 'devfolio.svg', 'moon.svg']) {
   const data = `data:${mime};base64,${(await readFile(join(root, 'assets', asset))).toString('base64')}`;
   js = js.split(`./assets/${asset}`).join(data);
 }
-const css = await readFile(join(root, html.match(cssTag)[1]), 'utf8');
+const cssPath = join(root, html.match(cssTag)[1]);
+let css = await readFile(cssPath, 'utf8');
+for (const match of [...css.matchAll(/url\(["']?([^\)"']+)["']?\)/g)]) {
+  if (match[1].startsWith('data:')) continue;
+  const data = 'data:font/woff2;base64,' + (await readFile(join(dirname(cssPath), match[1]))).toString('base64');
+  css = css.replace(match[0], () => 'url("' + data + '")');
+}
 html = html.replace(scriptTag, () => `<script type="module">${js.replace(/<\/script/gi, '<\\/script')}</script>`);
 html = html.replace(cssTag, () => `<style>${css}</style>`);
 html = html.replace('./favicon.svg', `data:image/svg+xml;base64,${(await readFile(join(root, 'favicon.svg'))).toString('base64')}`);
 const embeddedScript = html.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
 new Script(embeddedScript); // Verify embedding did not corrupt the production JavaScript.
 assert(!html.includes('src="./assets/'), 'No external bundle dependency');
-assert.equal((html.match(/<script /g) || []).length, 1);
+assert.equal((html.replace(/<script type=\"module\">[\s\S]*?<\/script>/, '').match(/<script(?:\s|>)/g) || []).length, 1, 'Theme bootstrap remains alongside the application script');
 await mkdir('outputs', { recursive: true });
 await writeFile('outputs/ECLIPSE-preview.html', html);
 console.log(`PASS: standalone local preview, ${(await stat('outputs/ECLIPSE-preview.html')).size} bytes, embedded assets and syntactically valid production JavaScript.`);
+

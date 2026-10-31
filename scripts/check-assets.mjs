@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
-import { resolve, extname, sep } from 'node:path';
+import { resolve, extname, sep, posix } from 'node:path';
 import assert from 'node:assert/strict';
 
 const root = resolve('dist');
@@ -10,15 +10,22 @@ const jsReference = references.find(ref => ref.endsWith('.js'));
 assert(jsReference, 'Production JavaScript bundle is referenced');
 const js = await readFile(resolve(root, jsReference), 'utf8');
 for (const match of js.matchAll(/["'](\.\/assets\/[^"']+)["']/g)) references.push(match[1]);
+for (const cssRef of references.filter(ref => ref.endsWith('.css'))) {
+  const css = await readFile(resolve(root, cssRef), 'utf8');
+  for (const match of css.matchAll(/url\(["']?([^\)"']+)["']?\)/g)) {
+    if (!match[1].startsWith('data:')) references.push('./' + posix.join(posix.dirname(cssRef), match[1]));
+  }
+}
 const assets = [...new Set(references.filter(ref => !ref.startsWith('http') && !ref.startsWith('#')))];
 assert(assets.some(ref => ref.endsWith('acm-logo.png')), 'Official ACM logo is bundled');
 assert(assets.some(ref => ref.endsWith('moon.svg')), 'Original SVG moon is bundled');
 assert(assets.some(ref => ref.endsWith('devfolio.svg')), 'Official partner logo is bundled');
+assert.equal(assets.filter(ref => ref.endsWith('.woff2')).length, 2, 'Both requested fonts are bundled');
 for (const ref of assets) {
   assert(!ref.startsWith('/'), `Asset is subdirectory-compatible: ${ref}`);
   assert((await stat(resolve(root, ref))).isFile(), `Asset exists: ${ref}`);
 }
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' };
 const server = createServer(async (req, res) => {
   try {
     let pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
