@@ -40,7 +40,7 @@ After building, run `npm run preview:standalone`. Open `outputs/ECLIPSE-preview.
 - `public/assets/`: bundled official ACM and Devfolio logos and the original procedural SVG moon.
 - `index.html`: title, description and theme metadata; update metadata if event dates change.
 
-The design bundles Barlow Condensed 600 and Manrope variable 400–700 as local WOFF2 files. No third-party font service is contacted by visitors. Font licenses are included in src/assets/fonts/. All images are bundled locally; the official ACM logo is used without filtering, recolouring or redrawing. The moon is an original SVG illustration, not a photograph or official asset.
+The ECLIPSE identity uses original SVG lettering in src/Observatory.tsx. Manrope variable 400–700 is bundled locally for body text and complementary headings. No third-party font service is contacted by visitors. The Manrope license is included in src/assets/fonts/. The unused Barlow source from the previous design is retained in history/source but is not included in the production bundle. All images are bundled locally; the official ACM logo is used without filtering, recolouring or redrawing. The moon is an original SVG illustration, not a photograph or official asset.
 
 ## GitHub
 
@@ -119,3 +119,15 @@ The refined website was checked in both themes at 360, 390, 768 and 1440 pixel v
 
 Font sources: Google Fonts CSS API; Barlow Condensed and Manrope from https://github.com/google/fonts (SIL Open Font License). Only the Latin subsets required by this English page are bundled.
 
+
+## Layered identity and pyramid refinement
+
+Git history comparison used `3bdf772` (the first layered hero) and `e68a72e` (the later bright disc). The hero restores background placement with intermediate surface values, deeper shadows, a softer rim and a radial edge mask. Mobile uses its own overlapping composition; light-theme opacity keeps the dark wordmark legible.
+
+`src/Observatory.tsx` contains an original path-based ECLIPSE letter system, with matching extended strokes, curved notches, eclipse arcs and an integrated 7.0. The semantic h1 supplies the accessible event name; the SVG is decorative within it. No official wordmark or font glyph outlines were copied. Official ACM and Devfolio assets remain unchanged.
+
+The same file contains a deterministic, non-repeating 168-point star field spanning the full document. Stars are static, ignore pointer events and adapt to both palettes. Section tints are translucent so open areas retain stars. The star field does not attach scroll handlers or animate particles.
+
+The pyramid roadmap uses only the existing three milestones. Desktop HTML number badges coincide with the SVG vertices; the apex copy sits immediately above 02, while lower-left and lower-right copy attach directly to 01 and 03. Arrows establish the sequence. A once-only route draw is decorative and does not indicate event completion. Mobile pairs compact original geometry with a normal readable ordered list and an external pre-registration button.
+
+Direct fragment URLs are aligned in a layout effect after React commits, and again once local fonts settle. Hash changes close the mobile menu before aligning with the actual sticky-header height. No scroll hijacking or history rewriting is used.

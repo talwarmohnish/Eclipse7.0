@@ -20,7 +20,7 @@ const assets = [...new Set(references.filter(ref => !ref.startsWith('http') && !
 assert(assets.some(ref => ref.endsWith('acm-logo.png')), 'Official ACM logo is bundled');
 assert(assets.some(ref => ref.endsWith('moon.svg')), 'Original SVG moon is bundled');
 assert(assets.some(ref => ref.endsWith('devfolio.svg')), 'Official partner logo is bundled');
-assert.equal(assets.filter(ref => ref.endsWith('.woff2')).length, 2, 'Both requested fonts are bundled');
+assert.equal(assets.filter(ref => ref.endsWith('.woff2')).length, 1, 'The body and heading font is bundled locally');
 for (const ref of assets) {
   assert(!ref.startsWith('/'), `Asset is subdirectory-compatible: ${ref}`);
   assert((await stat(resolve(root, ref))).isFile(), `Asset exists: ${ref}`);

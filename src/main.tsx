@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { event, faqs } from './content';
 import './styles.css';
+import { EclipseWordmark, PageStars, PyramidRoadmap } from './Observatory';
 
 type Theme = 'dark' | 'light';
 function Arrow({ diagonal = false, down = false }: { diagonal?: boolean; down?: boolean }) {
@@ -21,7 +22,7 @@ function Radar() {
 }
 const links = [['About', 'about'], ['Tracks', 'tracks'], ['Roadmap', 'timeline'], ['Partners', 'sponsors'], ['FAQs', 'faqs']];
 const milestones = [
-  { date: 'INTEREST FORM AVAILABLE', title: 'Pre-register', description: 'Start with your interest. Assemble a team of 2–5 and visit the official pre-registration form.', action: true },
+  { date: 'INTEREST FORM AVAILABLE', title: 'Pre-registration', description: 'Start with your interest. Assemble a team of 2–5 and visit the official pre-registration form.', action: true },
   { date: event.startDay, title: 'The hackathon', description: 'Join us in person at TIET, Patiala for the 24-hour hackathon. Build a project with your team.' },
   { date: event.endDay, title: 'Results & closing', description: 'The official event timeline marks 4 April for results and the closing of ECLIPSE 7.0.' },
 ];
@@ -51,8 +52,34 @@ function App() {
     document.querySelectorAll('.reveal').forEach(section => reveal.observe(section));
     return () => { observer.disconnect(); reveal.disconnect(); };
   }, []);
+  // Native hash targets do not exist until React commits. Align immediately,
+  // then re-align after local fonts settle so direct URLs and refreshes are reliable.
+  useLayoutEffect(() => {
+    let disposed = false;
+    let frame = 0;
+    const alignHash = () => {
+      if (disposed || !window.location.hash) return;
+      let id: string;
+      try { id = decodeURIComponent(window.location.hash.slice(1)); } catch { return; }
+      const target = document.getElementById(id);
+      if (!target) return;
+      const header = document.querySelector('.site-header')?.getBoundingClientRect().height ?? 88;
+      const top = Math.max(0, window.scrollY + target.getBoundingClientRect().top - header - 20);
+      window.scrollTo({ top, behavior: 'instant' });
+    };
+    const onHash = () => {
+      setMenuOpen(false);
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(alignHash);
+    };
+    alignHash();
+    document.fonts?.ready.then(alignHash);
+    window.addEventListener('hashchange', onHash);
+    return () => { disposed = true; cancelAnimationFrame(frame); window.removeEventListener('hashchange', onHash); };
+  }, []);
   const preregister = <a className="button button-primary" href={event.preRegistration} target="_blank" rel="noopener noreferrer">Pre-register <Arrow diagonal/></a>;
-  return <>
+  return <div className="site-shell">
+    <PageStars/>
     <a className="skip-link" href="#main">Skip to content</a>
     <header className="site-header"><div className="nav-shell">
       <a className="brand" href="#home" aria-label="ACM Thapar — back to top"><img src="./assets/acm-logo.png" alt="ACM Thapar" width="224" height="72"/></a>
@@ -63,21 +90,21 @@ function App() {
     </div><nav id="mobile-navigation" className="mobile-nav" aria-label="Mobile navigation" hidden={!menuOpen}>{links.map(([label, id], i) => <a key={id} href={`#${id}`} onClick={() => setMenuOpen(false)}><span>0{i + 1}</span>{label}<Arrow/></a>)}<a href={event.preRegistration} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}>Pre-register<Arrow diagonal/></a></nav></header>
     <main id="main">
       <section className="hero" id="home" aria-labelledby="hero-title">
-        <div className="star-field" aria-hidden="true"/><div className="hero-orbit" aria-hidden="true"/>
+        <div className="hero-orbit" aria-hidden="true"/>
         <div className="hero-topline"><Label>ACM THAPAR PRESENTS</Label><span className="observation-label">THE SEVENTH ALIGNMENT / 2027</span></div>
         <figure className="moon-scene"><img className="moon" src="./assets/moon.svg" alt="A textured eclipse moon, partly in shadow with a copper-red illuminated rim" width="640" height="640" fetchPriority="high"/><figcaption><span className="tiny-cross">+</span> OBSERVATION 07 / THE ECLIPSE</figcaption></figure>
-        <div className="hero-copy"><h1 id="hero-title">{event.name}<span className="sr-only"> {event.edition}</span></h1><div className="edition-line" aria-hidden="true"><span className="edition">7.0</span><span className="edition-line-rule"/><span>24-HOUR HACKATHON</span></div><p className="hero-lead">Build together.<br/>Make it real.</p><p className="hero-description">ACM Thapar’s flagship hackathon brings student developers, designers, and innovators together — in person, for 24 hours.</p><div className="hero-actions">{preregister}<a className="button button-text" href="#about">Explore the event <Arrow down/></a></div></div>
+        <div className="hero-copy"><h1 id="hero-title"><span className="sr-only">{event.name} {event.edition}</span><EclipseWordmark/></h1><div className="edition-line"><span>24-HOUR HACKATHON</span></div><p className="hero-lead">Build together.<br/>Make it real.</p><p className="hero-description">ACM Thapar’s flagship hackathon brings student developers, designers, and innovators together — in person, for 24 hours.</p><div className="hero-actions">{preregister}<a className="button button-text" href="#about">Explore the event <Arrow down/></a></div></div>
         <div className="hero-info"><DateRange/><div className="hero-place"><span className="field-label">EVENT VENUE</span><strong>{event.venue}</strong><span>In person</span></div><a className="scroll-cue" href="#about">Discover ECLIPSE <Arrow down/></a></div>
       </section>
       <section className="about section-shell" id="about" aria-labelledby="about-title"><div className="about-layout"><div className="about-copy reveal"><Label number="01">THE ALIGNMENT</Label><h2 id="about-title">People.<br/>Ideas. Code.</h2><p className="section-lead">The best projects start when different perspectives meet.</p><p>ECLIPSE 7.0 is ACM Thapar Student Chapter’s 24-hour hackathon. Bring your skills and curiosity to a team of 2–5, collaborate in person, and turn an idea into a working project.</p><a className="inline-link" href="#faqs">Who can participate? <Arrow/></a></div><Alignment/></div><div className="facts-strip"><div><strong>24<span>H</span></strong><p>To build together</p></div><div><strong>2–5</strong><p>People per team</p></div><div><strong>In person</strong><p>TIET, Patiala</p></div></div></section>
       <section className="tracks section-shell" id="tracks" aria-labelledby="tracks-title"><div className="section-heading reveal"><div><Label number="02">FIND YOUR DIRECTION</Label><h2 id="tracks-title">A signal on the horizon.</h2></div><p>Bring an open mind.<br/>Your challenge will follow.</p></div>{event.tracks ? <div className="published-tracks">{event.tracks.map(track=><article key={track.title}><h3>{track.title}</h3><p>{track.description}</p></article>)}</div> : <div className="tracks-signal reveal"><div className="signal-art"><Radar/><span className="signal-coordinate" aria-hidden="true">SIGNAL / 07.0</span></div><div className="signal-copy"><span className="field-label signal-status"><span className="status-dot"/> AWAITING TRANSMISSION</span><h3>Tracks announced soon</h3><p>Official tracks and problem statements are still to be revealed. Follow ACM Thapar for announcements from the organizers.</p><a className="inline-link" href={event.instagram} target="_blank" rel="noopener noreferrer">Follow the announcements <Arrow diagonal/></a></div></div>}</section>
-      <section className="timeline section-shell" id="timeline" aria-labelledby="timeline-title"><div className="roadmap-heading reveal"><div><Label number="03">YOUR EVENT ROADMAP</Label><h2 id="timeline-title">Three points.<br/>One shared journey.</h2><p>From registering your interest to the final day.<br/>Full schedule announced soon.</p></div><div className="roadmap-date"><span className="field-label">THE MAIN EVENT</span><DateRange large/></div></div><div className="journey reveal"><svg className="journey-route" viewBox="0 0 1200 300" fill="none" aria-hidden="true"><path className="journey-orbit" d="M90 235 Q600 -145 1110 235"/><path className="journey-path" pathLength="1" d="M190 220 C340 220 365 80 600 80 S860 220 1010 220"/><g className="journey-dot"><circle cx="190" cy="220" r="9"/><circle cx="600" cy="80" r="9"/><circle cx="1010" cy="220" r="9"/></g><path className="journey-cross" d="M590 215h20m-10-10v20"/></svg><ol className="journey-list">{milestones.map((milestone,i)=><li key={milestone.title}><span className="journey-number">0{i+1}</span><span className="milestone-date">{milestone.date}</span><h3>{milestone.title}</h3><p>{milestone.description}</p>{milestone.action&&<a className="inline-link" href={event.preRegistration} target="_blank" rel="noopener noreferrer">Visit the interest form <Arrow diagonal/></a>}</li>)}</ol><p className="journey-caption">An illustrated event journey. Dates and milestones are from the official event website.</p></div></section>
+      <section className="timeline section-shell" id="timeline" aria-labelledby="timeline-title"><div className="roadmap-heading reveal"><div><Label number="03">YOUR EVENT ROADMAP</Label><h2 id="timeline-title">Three points.<br/>One shared journey.</h2><p>From registering your interest to the final day.<br/>Full schedule announced soon.</p></div><div className="roadmap-date"><span className="field-label">THE MAIN EVENT</span><DateRange large/></div></div><PyramidRoadmap milestones={milestones}/></section>
       <section className="sponsors section-shell" id="sponsors" aria-labelledby="sponsors-title"><Label number="04">OUR PLATFORM PARTNER</Label><div className="sponsor-layout"><div className="reveal"><h2 id="sponsors-title">Supporting<br/>student builders.</h2><p>Devfolio is listed as the platform partner<br/>on the official ECLIPSE 7.0 website.</p></div><a className="partner-logo" href="https://devfolio.co" target="_blank" rel="noopener noreferrer" aria-label="Visit Devfolio"><img src="./assets/devfolio.svg" alt="Devfolio" width="230" height="54"/><Arrow diagonal/></a></div><div className="partner-invite"><div><h3>Help students build what’s next.</h3><p>Talk to ACM Thapar about partnering with ECLIPSE 7.0.</p></div><a className="button button-outline" href={`mailto:${event.partnership}?subject=ECLIPSE%207.0%20Partnership`}>Become a partner <Arrow diagonal/></a></div></section>
       <section className="faq section-shell" id="faqs" aria-labelledby="faq-title"><div className="faq-intro reveal"><Label number="05">GOOD TO KNOW</Label><h2 id="faq-title">Before<br/>you arrive.</h2><p>Eligibility, teams, and the practical details.</p><a className="inline-link" href={`mailto:${event.contact}`}>Ask the organizers <Arrow diagonal/></a></div><div className="faq-list">{faqs.map((faq,i)=><details key={faq.question}><summary><span className="faq-number">0{i+1}</span>{faq.question}<span className="faq-icon" aria-hidden="true"/></summary><div className="faq-answer"><p>{faq.answer}</p></div></details>)}</div></section>
       <section className="closing section-shell" id="contact" aria-labelledby="closing-title"><div className="closing-orbit" aria-hidden="true"/><Label number="06">JOIN THE SEVENTH ALIGNMENT</Label><h2 id="closing-title">Your next build<br/>starts with a team.</h2><p>{event.shortDate} <span className="closing-divider" aria-hidden="true">/</span> {event.venue}</p><div className="closing-actions">{preregister}<a className="button button-text" href={`mailto:${event.contact}`}>Get in touch <Arrow diagonal/></a></div><p className="registration-notice">Registration details coming soon.<br/>Pre-registration records your interest.</p></section>
     </main>
     <footer className="footer section-shell"><div className="footer-top"><a className="brand" href="#home" aria-label="ACM Thapar — back to top"><img src="./assets/acm-logo.png" alt="ACM Thapar" width="224" height="72"/></a><p>ACM Thapar Student Chapter<br/>A community for people who build.</p><div className="social-links"><a href={event.instagram} target="_blank" rel="noopener noreferrer">Instagram <Arrow diagonal/></a><a href={event.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn <Arrow diagonal/></a><a href={`mailto:${event.contact}`}>Email <Arrow diagonal/></a></div></div><div className="footer-bottom"><span>ECLIPSE 7.0 · ACM THAPAR</span><a href={event.source} target="_blank" rel="noopener noreferrer">Official event website <Arrow diagonal/></a><a href="#home">Back to top ↑</a></div></footer>
-  </>;
+  </div>;
 }
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App/></React.StrictMode>);
 

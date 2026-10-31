@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640">
 <defs>
- <radialGradient id="surface" cx="77%" cy="26%" r="91%"><stop stop-color="#d4b69a"/><stop offset=".3" stop-color="#a59a8b"/><stop offset=".58" stop-color="#737374"/><stop offset="1" stop-color="#30343d"/></radialGradient>
+ <radialGradient id="surface" cx="77%" cy="26%" r="91%"><stop stop-color="#a89380"/><stop offset=".3" stop-color="#77736d"/><stop offset=".58" stop-color="#4a505b"/><stop offset="1" stop-color="#30343d"/></radialGradient>
  <filter id="texture" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".027" numOctaves="5" seed="17" result="noise"/><feDiffuseLighting in="noise" lighting-color="#e3d5c4" surfaceScale="7" diffuseConstant="1.05" result="lit"><feDistantLight azimuth="320" elevation="33"/></feDiffuseLighting><feComposite in="lit" in2="SourceGraphic" operator="in"/><feBlend in="SourceGraphic" mode="multiply"/></filter>
- <radialGradient id="shadow" cx="14%" cy="67%" r="94%"><stop offset=".04" stop-color="#080e19"/><stop offset=".32" stop-color="#080e19" stop-opacity=".99"/><stop offset=".57" stop-color="#080e19" stop-opacity=".86"/><stop offset=".8" stop-color="#080e19" stop-opacity=".22"/><stop offset="1" stop-color="#080e19" stop-opacity="0"/></radialGradient>
+ <radialGradient id="shadow" cx="14%" cy="67%" r="94%"><stop offset=".04" stop-color="#080e19"/><stop offset=".32" stop-color="#080e19" stop-opacity=".99"/><stop offset=".57" stop-color="#080e19" stop-opacity=".92"/><stop offset=".8" stop-color="#080e19" stop-opacity=".4"/><stop offset="1" stop-color="#080e19" stop-opacity="0"/></radialGradient>
  <linearGradient id="rim" x1="0" y1="1" x2="1" y2="0"><stop offset=".14" stop-color="#984329" stop-opacity=".1"/><stop offset=".42" stop-color="#a8442f" stop-opacity=".55"/><stop offset=".72" stop-color="#d0744f"/><stop offset="1" stop-color="#f2ba88"/></linearGradient>
  <radialGradient id="crater"><stop stop-color="#151b24" stop-opacity=".48"/><stop offset=".69" stop-color="#2f3033" stop-opacity=".23"/><stop offset=".83" stop-color="#e1c6a3" stop-opacity=".28"/><stop offset="1" stop-color="#938373" stop-opacity="0"/></radialGradient>
  <clipPath id="disc"><circle cx="320" cy="320" r="282"/></clipPath>
@@ -10,5 +10,5 @@
 <g clip-path="url(#disc)"><circle cx="320" cy="320" r="282" fill="url(#surface)" filter="url(#texture)"/>
 <g fill="url(#crater)"><circle cx="459" cy="183" r="49"/><circle cx="417" cy="277" r="65"/><circle cx="493" cy="356" r="42"/><circle cx="347" cy="115" r="32"/><circle cx="366" cy="402" r="54"/><circle cx="496" cy="240" r="20"/><circle cx="278" cy="226" r="40"/><circle cx="385" cy="191" r="21"/><circle cx="534" cy="310" r="20"/><circle cx="300" cy="470" r="33"/><circle cx="457" cy="438" r="22"/><circle cx="287" cy="153" r="13"/><circle cx="391" cy="330" r="14"/><circle cx="443" cy="131" r="13"/><circle cx="524" cy="386" r="12"/><circle cx="490" cy="476" r="26"/><circle cx="553" cy="226" r="18"/></g>
 <circle cx="320" cy="320" r="283" fill="url(#shadow)"/>
-</g><circle cx="320" cy="320" r="281" fill="none" stroke="url(#rim)" stroke-width="2.6"/>
+</g><circle cx="320" cy="320" r="281" fill="none" stroke="url(#rim)" stroke-width="1.9"/>
 </svg>
